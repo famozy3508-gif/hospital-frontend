@@ -17,3 +17,4 @@ If you are developing a production application, we recommend using TypeScript wi
 "# hospitalfront-end" 
 "# hospitalfront-end" 
 "# hospitalfront-end" 
+"# hospital-frontend" 
