@@ -2,10 +2,10 @@
 // ตัวเชื่อม API กลาง ใช้เรียก PHP backend ทุกจุด
 
 // ===== ตอนพัฒนา (localhost) ใช้บรรทัดนี้ =====
-export const API_BASE = 'http://localhost/hospital-system-v2/backend/api';
+// export const API_BASE = 'http://localhost/hospital-system-v2/backend/api';
 
 // ===== ตอนมีโดเมน/โฮสติ้งจริงแล้ว ให้คอมเมนต์บรรทัดบนออก แล้วเปิดใช้บรรทัดนี้แทน =====
-// export const API_BASE = 'https://yourdomain.com/backend/api';
+export const API_BASE = 'https://hospitalback-end.onrender.com/api';
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
