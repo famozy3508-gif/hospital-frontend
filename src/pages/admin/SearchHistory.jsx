@@ -1,10 +1,8 @@
 // src/pages/admin/SearchHistory.jsx
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api, API_BASE } from '../../api/client';
+import { api, API_BASE, avatarUrl } from '../../api/client';
 import LoadingScreen from '../../components/LoadingScreen';
-
-const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 
 const SEVERITY_LABEL = { mild: 'เล็กน้อย', moderate: 'ปานกลาง', severe: 'รุนแรง' };
 const STATUS_LABEL = { pending: 'รอถึงกำหนด', completed: 'เสร็จสิ้นแล้ว', cancelled: 'ยกเลิกแล้ว' };
@@ -73,7 +71,7 @@ export default function SearchHistory() {
           border: '3px solid #fff', boxShadow: '0 10px 24px rgba(30,78,140,0.18)', fontSize: 58, color: 'var(--blue)',
         }}>
           {student.avatar ? (
-            <img src={`${UPLOAD_BASE}/uploads/avatars/${student.avatar}`} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={avatarUrl(student.avatar)} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : '👤'}
         </div>
         <p style={{ margin: '10px 0 0', fontWeight: 700, color: 'var(--ink)', fontSize: 17 }}>

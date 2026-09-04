@@ -1,12 +1,10 @@
 // src/pages/student/Profile.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, API_BASE } from '../../api/client';
+import { api, avatarUrl } from '../../api/client';
 import LoadingScreen from '../../components/LoadingScreen';
 import ImageCropper from '../../components/ImageCropper';
 import StatusModal from '../../components/StatusModal';
-
-const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -48,7 +46,7 @@ export default function Profile() {
     setAvatarError('');
     try {
       const res = await api.uploadFile('/student/upload_avatar.php', croppedFile);
-      setForm((f) => ({ ...f, avatar: res.filename }));
+      setForm((f) => ({ ...f, avatar: res.url }));
     } catch (err) {
       setAvatarError(err.message);
     } finally {
@@ -92,7 +90,7 @@ export default function Profile() {
           border: '3px solid #fff', boxShadow: '0 10px 24px rgba(30,78,140,0.18)', fontSize: 44, color: 'var(--blue)',
         }}>
           {form.avatar ? (
-            <img src={`${UPLOAD_BASE}/uploads/avatars/${form.avatar}`} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={avatarUrl(form.avatar)} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : '👤'}
         </div>
         <div className={`file-upload-wrap ${avatarUploading ? 'uploading' : ''}`}>

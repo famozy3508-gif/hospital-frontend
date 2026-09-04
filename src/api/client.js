@@ -7,6 +7,15 @@
 // ===== ตอนมีโดเมน/โฮสติ้งจริงแล้ว ให้คอมเมนต์บรรทัดบนออก แล้วเปิดใช้บรรทัดนี้แทน =====
 export const API_BASE = 'https://hospitalback-end.onrender.com/api';
 
+const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
+
+// รูปโปรไฟล์ใหม่เก็บเป็น URL เต็มจาก Cloudinary อยู่แล้ว (ขึ้นต้นด้วย http)
+// ส่วนข้อมูลเก่าก่อนย้ายมาใช้ Cloudinary ยังเป็นแค่ชื่อไฟล์ ต้องต่อ path เดิมให้
+export function avatarUrl(avatar) {
+  if (!avatar) return '';
+  return avatar.startsWith('http') ? avatar : `${UPLOAD_BASE}/uploads/avatars/${avatar}`;
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,

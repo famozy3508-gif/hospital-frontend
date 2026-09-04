@@ -1,12 +1,10 @@
 // src/pages/admin/ManageStudents.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, API_BASE } from '../../api/client';
+import { api, avatarUrl } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
 import StatusModal from '../../components/StatusModal';
-
-const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -73,7 +71,7 @@ export default function ManageStudents() {
     setAvatarError('');
     try {
       const res = await api.uploadFile('/admin/upload_avatar.php', croppedFile);
-      setForm((f) => ({ ...f, avatar: res.filename }));
+      setForm((f) => ({ ...f, avatar: res.url }));
     } catch (err) {
       setAvatarError(err.message);
     } finally {
@@ -141,7 +139,7 @@ export default function ManageStudents() {
             border: '2px solid var(--line)', fontSize: 34, color: 'var(--blue)',
           }}>
             {form.avatar ? (
-              <img src={`${UPLOAD_BASE}/uploads/avatars/${form.avatar}`} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={avatarUrl(form.avatar)} alt="รูปโปรไฟล์" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : '👤'}
           </div>
           <div>
@@ -365,7 +363,7 @@ export default function ManageStudents() {
                         fontSize: 18, color: 'var(--blue)',
                       }}>
                         {s.avatar ? (
-                          <img src={`${UPLOAD_BASE}/uploads/avatars/${s.avatar}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={avatarUrl(s.avatar)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : '👤'}
                       </div>
                     </td>

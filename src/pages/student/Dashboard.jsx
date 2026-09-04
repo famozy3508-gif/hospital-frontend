@@ -1,12 +1,10 @@
 // src/pages/student/Dashboard.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, API_BASE } from '../../api/client';
+import { api, avatarUrl } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import LoadingScreen from '../../components/LoadingScreen';
 import ConfirmModal from '../../components/ConfirmModal';
-
-const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 
 export default function StudentDashboard() {
   const [summary, setSummary] = useState(null);
@@ -35,7 +33,7 @@ export default function StudentDashboard() {
         {summary.avatar ? (
           <img
             className="student-topbar-avatar"
-            src={`${UPLOAD_BASE}/uploads/avatars/${summary.avatar}`}
+            src={avatarUrl(summary.avatar)}
             alt="รูปโปรไฟล์"
           />
         ) : (

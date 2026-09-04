@@ -1,11 +1,10 @@
 // src/pages/admin/Dashboard.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, API_BASE } from '../../api/client';
+import { api, avatarUrl } from '../../api/client';
 import AdminSidebar from '../../components/AdminSidebar';
 import LoadingScreen from '../../components/LoadingScreen';
 
-const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 const DONUT_COLORS = ['#1E4E8C', '#2B6CB0', '#4C93D6', '#7FB2E5', '#B7D4EF', '#DDE7F1'];
 
 function DonutChart({ data }) {
@@ -101,7 +100,7 @@ export default function AdminDashboard() {
 
       <div className="dashboard-header">
         {summary.nurse_avatar ? (
-          <img src={`${UPLOAD_BASE}/uploads/avatars/${summary.nurse_avatar}`} alt="รูปโปรไฟล์" />
+          <img src={avatarUrl(summary.nurse_avatar)} alt="รูปโปรไฟล์" />
         ) : (
           <div style={{
             width: 96, height: 96, borderRadius: '50%', border: '3px solid #fff',
