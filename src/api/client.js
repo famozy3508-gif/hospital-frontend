@@ -16,14 +16,51 @@ export function avatarUrl(avatar) {
   return avatar.startsWith('http') ? avatar : `${UPLOAD_BASE}/uploads/avatars/${avatar}`;
 }
 
+// ===== Token-based auth (แทน PHP session cookie) =====
+// เดิมใช้ session cookie ข้ามโดเมน (Vercel <-> Render) แต่มือถือ (Safari/Chrome mobile) บล็อก
+// third-party cookie ทำให้ล็อกอินค้าง จึงเก็บ token ไว้ใน localStorage แล้วแนบไปกับทุก request
+// ผ่าน Authorization: Bearer <token> แทน ซึ่งไม่ผูกกับนโยบาย cookie ของเบราว์เซอร์เลย
+const TOKEN_KEY = 'auth_token';
+
+export function getToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setToken(token) {
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    // localStorage ใช้ไม่ได้ (เช่น private mode) - ปล่อยผ่าน แค่ต้องล็อกอินใหม่ทุกครั้งที่รีเฟรชหน้า
+  }
+}
+
+export function clearToken() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // เช่นเดียวกับด้านบน
+  }
+}
+
+function authHeaders(extra = {}) {
+  const token = getToken();
+  return {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extra,
+  };
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    credentials: 'include', // สำคัญมาก: ส่ง session cookie ไปด้วยทุกครั้ง
-    headers: {
+    headers: authHeaders({
       'Content-Type': 'application/json',
       ...(options.headers || {}),
-    },
+    }),
   });
 
   let data;
@@ -49,8 +86,8 @@ export const api = {
     formData.append(fieldName, file);
     const res = await fetch(`${API_BASE}${path}`, {
       method: 'POST',
-      credentials: 'include',
-      body: formData, // ไม่ต้องตั้ง Content-Type เอง เบราว์เซอร์จะใส่ boundary ให้อัตโนมัติ
+      headers: authHeaders(), // ไม่ตั้ง Content-Type เอง เบราว์เซอร์จะใส่ boundary ให้อัตโนมัติ
+      body: formData,
     });
     let data;
     try { data = await res.json(); } catch { throw new Error('เซิร์ฟเวอร์ตอบกลับไม่ถูกต้อง'); }

@@ -1,7 +1,7 @@
 // src/pages/admin/SearchHistory.jsx
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api, API_BASE, avatarUrl } from '../../api/client';
+import { api, API_BASE, avatarUrl, getToken } from '../../api/client';
 import LoadingScreen from '../../components/LoadingScreen';
 
 const SEVERITY_LABEL = { mild: 'เล็กน้อย', moderate: 'ปานกลาง', severe: 'รุนแรง' };
@@ -154,7 +154,9 @@ export default function SearchHistory() {
       ))}
 
       <p style={{ marginTop: 15 }}>
-        <a href={`${API_BASE}/admin/export_pdf.php?student_id=${viewId}`}
+        {/* ลิงก์นี้เปิดผ่านการนำทางตรงๆ ของเบราว์เซอร์ แนบ Authorization header ไม่ได้
+            เลยต้องส่ง token ผ่าน query string แทน (backend รองรับ fallback นี้ไว้แล้ว) */}
+        <a href={`${API_BASE}/admin/export_pdf.php?student_id=${viewId}&token=${encodeURIComponent(getToken() || '')}`}
            target="_blank" rel="noreferrer"
            style={{ background: '#2B6CB0', color: '#fff', padding: '8px 16px', borderRadius: 6, textDecoration: 'none' }}>
           📄 ส่งออกเป็น PDF
