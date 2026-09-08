@@ -1,11 +1,9 @@
 // src/api/client.js
 // ตัวเชื่อม API กลาง ใช้เรียก PHP backend ทุกจุด
 
-// ===== ตอนพัฒนา (localhost) ใช้บรรทัดนี้ =====
-// export const API_BASE = 'http://localhost/hospital-system-v2/backend/api';
-
-// ===== ตอนมีโดเมน/โฮสติ้งจริงแล้ว ให้คอมเมนต์บรรทัดบนออก แล้วเปิดใช้บรรทัดนี้แทน =====
-export const API_BASE = 'https://hospitalback-end.onrender.com/api';
+// อ่านค่าจาก VITE_API_BASE (ตั้งใน .env.local เวลาพัฒนาในเครื่อง เช่น http://localhost:8080/api)
+// ถ้าไม่ได้ตั้งไว้ (เช่นตอน build ขึ้น Vercel) จะ fallback ไปที่เซิร์ฟเวอร์จริงบน Render โดยอัตโนมัติ
+export const API_BASE = import.meta.env.VITE_API_BASE || 'https://hospitalback-end.onrender.com/api';
 
 const UPLOAD_BASE = API_BASE.replace(/\/api$/, '');
 
