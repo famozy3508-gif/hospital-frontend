@@ -111,7 +111,7 @@ export default function ManageVisits() {
         {!editing && (
           <>
             <label>ค้นหานักเรียน</label>
-            <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 1fr auto auto', alignItems: 'center', marginBottom: 8 }}>
+            <div className="field-row search-row">
               <input
                 type="text"
                 inputMode="numeric"
@@ -177,6 +177,10 @@ export default function ManageVisits() {
 
   return (
     <div className="admin-panel">
+      {!(editing || showAddForm) && (
+        <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
+      )}
+
       <h2>บันทึกการเข้ารับบริการ</h2>
       {error && <p className="alert-error">{error}</p>}
       {success && <p className="alert-success">{success}</p>}
@@ -242,12 +246,12 @@ export default function ManageVisits() {
           </h3>
 
           {visits.length === 0 ? <p>ไม่พบประวัติการบันทึก</p> : visits.map((v) => (
-            <div className="info-box" key={v.visit_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+            <div className="info-box list-item-row" key={v.visit_id}>
               <div>
                 📅 {new Date(v.visit_datetime).toLocaleString('th-TH')} - <strong>{v.student_code} {v.first_name} {v.last_name}</strong><br />
                 อาการ: {v.symptoms}
               </div>
-              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                 <a href="#" className="btn-edit-row" onClick={(e) => { e.preventDefault(); startEdit(v); }}>แก้ไข</a>
                 <a href="#" className="btn-delete-row" onClick={(e) => { e.preventDefault(); handleDelete(v.visit_id); }}>ลบ</a>
               </div>

@@ -214,7 +214,7 @@ export default function ManageAppointments() {
     <div className="slide-panel">
       <h3 style={{ marginTop: 0 }}>แก้ไขนัดหมาย</h3>
       <form onSubmit={handleEditSubmit}>
-        <div className="field-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 20 }}>
+        <div className="field-row date-picker-row">
           <div>
             <label>วัน</label>
             <select value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })} required>
@@ -234,7 +234,7 @@ export default function ManageAppointments() {
             </select>
           </div>
         </div>
-        <div className="field-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 20 }}>
+        <div className="field-row time-picker-row">
           <div>
             <label>ชั่วโมง</label>
             <select value={form.hour} onChange={(e) => setForm({ ...form, hour: e.target.value })} required>
@@ -276,7 +276,7 @@ export default function ManageAppointments() {
       <h3 style={{ marginTop: 0 }}>สร้างนัดหมายใหม่ {draftList.length > 0 && `— รอสร้าง ${draftList.length} รายการ`}</h3>
 
       <label>ค้นหานักเรียน</label>
-      <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 1fr auto auto', alignItems: 'center', marginBottom: 8 }}>
+      <div className="field-row search-row">
         <input
           type="text"
           inputMode="numeric"
@@ -321,7 +321,7 @@ export default function ManageAppointments() {
           </select>
         </div>
 
-        <div className="field-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 20 }}>
+        <div className="field-row date-picker-row">
           <div>
             <label>วัน</label>
             <select value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })}>
@@ -345,7 +345,7 @@ export default function ManageAppointments() {
           </div>
         </div>
 
-        <div className="field-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 20 }}>
+        <div className="field-row time-picker-row">
           <div>
             <label>ชั่วโมง</label>
             <select value={form.hour} onChange={(e) => setForm({ ...form, hour: e.target.value })}>
@@ -382,13 +382,13 @@ export default function ManageAppointments() {
         <div style={{ marginTop: 28 }}>
           <h3>รายการที่รอสร้าง ({draftList.length} คน)</h3>
           {draftList.map((item) => (
-            <div className="info-box" key={item._draftId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+            <div className="info-box list-item-row" key={item._draftId}>
               <div>
                 <strong>{item._label}</strong><br />
                 📅 {item.day}/{item.month}/{item.year} เวลา {String(item.hour).padStart(2,'0')}:{String(item.minute).padStart(2,'0')} น.<br />
                 เหตุผล: {item.reason || '-'}
               </div>
-              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                 <a href="#" className="btn-edit-row" onClick={(e) => { e.preventDefault(); editDraft(item); }}>แก้ไข</a>
                 <a href="#" className="btn-delete-row" onClick={(e) => { e.preventDefault(); removeDraft(item._draftId); }}>ลบออก</a>
               </div>
@@ -406,6 +406,11 @@ export default function ManageAppointments() {
   return (
     <div className="admin-panel">
       <StatusModal status={modalStatus} message={modalMessage} onClose={() => setModalStatus(null)} />
+
+      {!(editing || showAddForm) && (
+        <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
+      )}
+
       <h2>จัดการนัดหมาย</h2>
       {success && <p className="alert-success">{success}</p>}
 

@@ -236,7 +236,7 @@ export default function ManageStudents() {
               )}
             </div>
 
-            <div className="field-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            <div className="field-row level-dept-row">
               <div>
                 <label>ระดับชั้น</label>
                 <select value={form.education_level} onChange={(e) => setForm({ ...form, education_level: e.target.value })}>
@@ -275,6 +275,10 @@ export default function ManageStudents() {
         hideConfirmButton
         autoCloseMs={1800}
       />
+
+      {!(editing || showAddForm) && (
+        <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
+      )}
 
       <h2>จัดการสมาชิก</h2>
       {error && <p className="alert-error">{error}</p>}
@@ -321,8 +325,18 @@ export default function ManageStudents() {
             </div>
           </form>
 
-          <h3>รายชื่อสมาชิกทั้งหมด ({list.length} คน) — คลิกที่แถวเพื่อดูประวัติ (เฉพาะ User)</h3>
-          <table style={{ width: '100%' }}>
+          <h3>
+            <div className="th-with-add">
+              <span>รายชื่อสมาชิกทั้งหมด ({list.length} คน) — คลิกที่แถวเพื่อดูประวัติ (เฉพาะ User)</span>
+              <button
+                type="button"
+                className="btn-add-circle"
+                title="เพิ่มสมาชิกใหม่"
+                onClick={(e) => { e.stopPropagation(); setShowAddForm(true); setForm(emptyForm); }}
+              >+</button>
+            </div>
+          </h3>
+          <table className="responsive-table" style={{ width: '100%' }}>
             <thead>
               <tr>
                 <th></th>
@@ -330,17 +344,7 @@ export default function ManageStudents() {
                 <th>ตำแหน่ง</th>
                 <th>ชื่อ-สกุล (ชื่อเล่น)</th>
                 <th>ระดับชั้น/สาขา</th>
-                <th>
-                  <div className="th-with-add">
-                    <span>จัดการ</span>
-                    <button
-                      type="button"
-                      className="btn-add-circle"
-                      title="เพิ่มสมาชิกใหม่"
-                      onClick={(e) => { e.stopPropagation(); setShowAddForm(true); setForm(emptyForm); }}
-                    >+</button>
-                  </div>
-                </th>
+                <th>จัดการ</th>
               </tr>
             </thead>
             <tbody>
@@ -356,7 +360,7 @@ export default function ManageStudents() {
                     onClick={() => handleRowClick(s)}
                     className={clickable ? 'row-clickable' : ''}
                   >
-                    <td>
+                    <td data-label="รูปโปรไฟล์">
                       <div style={{
                         width: 40, height: 40, borderRadius: '50%', overflow: 'hidden',
                         background: 'var(--blue-light)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -367,11 +371,11 @@ export default function ManageStudents() {
                         ) : '👤'}
                       </div>
                     </td>
-                    <td>{s.username}</td>
-                    <td>{roleDisplay}</td>
-                    <td>{name || '-'}{s.role === 'student' && s.nickname ? ` (${s.nickname})` : ''}</td>
-                    <td>{[s.education_level, s.department].filter(Boolean).join(' ') || '-'}</td>
-                    <td>
+                    <td data-label="Username">{s.username}</td>
+                    <td data-label="ตำแหน่ง">{roleDisplay}</td>
+                    <td data-label="ชื่อ-สกุล (ชื่อเล่น)">{name || '-'}{s.role === 'student' && s.nickname ? ` (${s.nickname})` : ''}</td>
+                    <td data-label="ระดับชั้น/สาขา">{[s.education_level, s.department].filter(Boolean).join(' ') || '-'}</td>
+                    <td data-label="จัดการ">
                       <a href="#" className="btn-edit-row" onClick={(e) => { e.stopPropagation(); e.preventDefault(); startEdit(s); }}>แก้ไข</a>{' '}
                       {s.user_id === user?.user_id ? (
                         <span style={{ color: '#aaa', fontSize: 13 }}>(บัญชีของคุณ)</span>

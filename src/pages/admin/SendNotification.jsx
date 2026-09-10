@@ -181,7 +181,7 @@ export default function SendNotification() {
       <StatusModal status={modalStatus} message={modalMessage} onClose={() => setModalStatus(null)} />
 
       {!showForm && (
-        <Link to="/admin/dashboard" style={{ display: 'block', marginBottom: 24 }}>« ย้อนกลับ</Link>
+        <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
       )}
       <h2>ส่งแจ้งเตือนถึงนักเรียน</h2>
 
@@ -214,7 +214,7 @@ export default function SendNotification() {
           ) : (
             <>
               <label>ค้นหานักเรียน</label>
-              <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 1fr auto auto', alignItems: 'center', marginBottom: 8 }}>
+              <div className="field-row search-row">
                 <input
                   type="text"
                   inputMode="numeric"
@@ -281,12 +281,12 @@ export default function SendNotification() {
                 <div style={{ marginTop: 28 }}>
                   <h3>รายการที่รอส่ง ({draftList.length} คน)</h3>
                   {draftList.map((item) => (
-                    <div className="info-box" key={item._draftId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                    <div className="info-box list-item-row" key={item._draftId}>
                       <div>
                         <strong>{item._label}</strong><br />
                         ข้อความ: {item.message}
                       </div>
-                      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
                         <a href="#" className="btn-edit-row" onClick={(e) => { e.preventDefault(); editDraft(item); }}>แก้ไข</a>
                         <a href="#" className="btn-delete-row" onClick={(e) => { e.preventDefault(); removeDraft(item._draftId); }}>ลบออก</a>
                       </div>
@@ -316,7 +316,7 @@ export default function SendNotification() {
           </h3>
 
           {notifications.length === 0 ? <p>ยังไม่มีแจ้งเตือนที่ส่ง</p> : notifications.map((n) => (
-            <div className="info-box" key={n.notification_id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+            <div className="info-box list-item-row" key={n.notification_id}>
               <div>
                 🔔 {n.message}<br />
                 ถึง: <strong>{n.student_code} {n.first_name} {n.last_name}</strong> | <small>{new Date(n.created_at).toLocaleString('th-TH')} น.</small> | {n.is_read ? '✅ อ่านแล้ว' : '⬜ ยังไม่อ่าน'}

@@ -377,6 +377,38 @@ a[href="/student/delete-account"]:hover {
     margin-bottom: 4px;
 }
 
+/* ===== แถวค้นหานักเรียน (รหัส + ระดับชั้น + สาขา + ปุ่มค้นหา + ล้าง) =====
+   ใช้คู่กับ .field-row เสมอ (className="field-row search-row") — กำหนดแค่ grid-template-columns
+   เฉพาะจุด เพื่อไม่ให้กระทบ .field-row จุดอื่น (เช่น วัน/เดือน/ปี, ชั่วโมง/นาที ในหน้านัดหมาย)
+   บนจอ ≤768px กฎ .field-row ในโซนมือถือด้านล่างของไฟล์นี้จะ override ให้เรียงเป็น 1 คอลัมน์เอง */
+.search-row {
+    grid-template-columns: 1fr 1fr 1fr auto auto;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* ===== แถววัน/เดือน/ปี (ใช้คู่กับ .field-row: className="field-row date-picker-row") =====
+   ชื่อเดือนภาษาไทยยาว (เช่น "พฤศจิกายน") บนจอ ≤768px ปล่อยให้กฎ .field-row มือถือด้านล่าง
+   ของไฟล์นี้ override เป็น 1 คอลัมน์ (เรียงลงมา) ให้เอง เพื่อไม่ให้ตัวเลือกเดือนถูกบีบจนอ่านไม่ออก */
+.date-picker-row {
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 20px;
+}
+
+/* ===== แถวชั่วโมง/นาที (ใช้คู่กับ .field-row: className="field-row time-picker-row") =====
+   เป็นตัวเลขสั้นๆ อยู่แถวเดียวกันได้สบายแม้จอเล็ก จึงคง 2 คอลัมน์ไว้เหมือนเดิมทุกขนาดจอ
+   (ไม่ปล่อยให้ .field-row มือถือ stack ให้ — ดูจุด override เฉพาะใน media query ด้านล่าง) */
+.time-picker-row {
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 20px;
+}
+
+/* ===== แถวระดับชั้น/สาขาวิชา (ใช้คู่กับ .field-row: className="field-row level-dept-row") =====
+   ชื่อสาขายาวมาก บนจอ ≤768px ปล่อยให้กฎ .field-row มือถือ stack เป็น 1 คอลัมน์เหมือน date-picker-row */
+.level-dept-row {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .slide-panel {
     border: 2px solid var(--blue-light);
     background: var(--blue-light);
@@ -492,6 +524,16 @@ a.btn-delete-row:hover { background: #FBDEDE; }
 .appt-card.status-completed { border-left-color: var(--success); background: rgba(238,247,241,0.85); }
 .appt-card.status-cancelled { border-left-color: var(--error); background: rgba(253,240,240,0.85); }
 
+/* ===== แถวรายการ + ปุ่มจัดการทางขวา (ใช้คู่กับ .info-box เสมอ: className="info-box list-item-row")
+   เดิมเป็น inline style ซ้ำกัน 4 จุด (ตะกร้านัดหมาย/แจ้งเตือน, ประวัติการเข้ารับบริการ, แจ้งเตือนที่ส่งแล้ว)
+   ดึงมาเป็น class เพื่อให้ควบคุมด้วย media query ตอนจอเล็กได้ โดยไม่กระทบ .info-box จุดอื่นที่ไม่ใช่แถวแบบนี้ ===== */
+.list-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
 /* ===== ช่องเหตุผลนัดหมาย ให้กว้างเต็มแถว ===== */
 .reason-field-wide {
     width: 100%;
@@ -515,6 +557,44 @@ a.btn-delete-row:hover { background: #FBDEDE; }
 }
 .row-clickable:hover td:last-child {
     box-shadow: inset -2px 0 0 var(--blue), inset 0 2px 0 var(--blue), inset 0 -2px 0 var(--blue);
+}
+
+/* ===== ตารางที่แปลงเป็นการ์ดบนจอเล็ก (ใส่ class="responsive-table" เฉพาะตารางที่ต้องการ) =====
+   บนจอ ≥769px แสดงผลเป็นตาราง <table> ปกติทุกประการ ไม่มีอะไรเปลี่ยน
+   บนจอ ≤768px ซ่อน thead แล้วแปลงแต่ละ tr ให้เป็นการ์ด โดยดึงหัวข้อคอลัมน์จาก attribute data-label บน td มาแสดง */
+@media (max-width: 768px) {
+    .responsive-table thead { display: none; }
+    .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
+        display: block;
+        width: 100%;
+    }
+    .responsive-table tr {
+        margin-bottom: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 6px 14px;
+        background: #fff;
+    }
+    .responsive-table td {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--panel);
+        text-align: right;
+    }
+    .responsive-table td:last-child { border-bottom: none; }
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-family: 'Prompt', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--muted);
+        text-align: left;
+        flex-shrink: 0;
+    }
 }
 
 /* ===== ปุ่มแฮมเบอร์เกอร์ ===== */
@@ -977,14 +1057,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     * { transition: none !important; animation: none !important; }
 }
 
-/* ===== ขยายขนาดเฉพาะหน้าที่ใช้ .admin-panel เหมือนซูม 125% (เฉพาะหน้าจอที่ไม่ใช่มือถือ) ===== */
-@media (min-width: 501px) {
+/* ===== ขยายขนาดเฉพาะหน้าที่ใช้ .admin-panel เหมือนซูม 125% (เฉพาะจอเดสก์ท็อปจริงๆ ตั้งแต่ 1024px ขึ้นไป) =====
+   เดิมเริ่มที่ 501px ทำให้แท็บเล็ตและมือถือแนวนอน (ซึ่งกว้างกว่า 500px แต่ไม่ใช่จอเดสก์ท็อป) โดนซูมไปด้วย
+   พื้นที่ใช้งานจริงเลยเหลือแค่ ~1/1.25 เท่า ซ้ำเติมปัญหา layout ล้นในช่วงจอนั้น */
+@media (min-width: 1024px) {
     .admin-panel {
         zoom: 1.25;
     }
 }
 
-@media (max-width: 500px) {
+/* ===== จอมือถือ (ขยายจากเดิม ≤500px เป็น ≤768px ให้ครอบคลุมมือถือจอใหญ่/แนวนอนด้วย) ===== */
+@media (max-width: 768px) {
     html { font-size: 17px; }
     body { padding: 16px 10px; background-attachment: scroll; }
     .form-container { padding: 30px 24px; margin: 20px auto; }
@@ -999,6 +1082,43 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     .dashboard-header img { width: 64px; height: 64px; }
     .dashboard-header .greeting-name { font-size: 22px; }
     .donut-wrap { flex-direction: column; }
+
+    /* การ์ดนัดหมาย + แถวรายการ (ตะกร้า/ประวัติ/แจ้งเตือน): เรียงเนื้อหาลงมาแทนเรียงข้าง
+       ปุ่ม action เดิมมี flexWrap:'wrap' ติดมาจาก inline style อยู่แล้ว (appt-card) พอมีที่เต็มความกว้าง
+       บรรทัดล่างก็ wrap เองได้ทันทีโดยไม่ต้องแก้ inline style เพิ่ม */
+    .appt-card, .list-item-row { flex-direction: column; }
+
+    /* ปุ่มแก้ไข/ลบ/มาตามนัดแล้ว/ยกเลิกนัด: ขยายพื้นที่กดให้ถึง 44px ตามเกณฑ์ touch target บนมือถือ */
+    a.btn-edit-row, a.btn-delete-row, .btn-outline-small {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ปุ่ม "« กลับหน้าหลัก"/"« ย้อนกลับ"/"ล้างการค้นหา" (.btn-back-panel): ขยายพื้นที่กดให้ถึง 44px เช่นกัน */
+    .btn-back-panel {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* ชั่วโมง/นาที เป็นตัวเลขสั้น ให้อยู่ 2 คอลัมน์เหมือนเดิมแม้จอเล็ก (ไม่ให้ .field-row ข้างบน stack ให้)
+       ใช้ selector คู่ (.field-row.time-picker-row) แทน !important เพื่อชนะ .field-row เฉพาะจุดนี้ */
+    .field-row.time-picker-row { grid-template-columns: repeat(2, 1fr); }
+
+    /* ปุ่ม "+" เพิ่มรายการ: ขยายเป็น 44x44 เฉพาะบนมือถือ (บนจอคอมคงขนาดเดิม 30x30 ไว้ ไม่ให้ดูใหญ่เกินไป) */
+    .btn-add-circle { width: 44px; height: 44px; font-size: 22px; }
+
+    /* ปุ่มปิดเมนู sidebar: ขยายพื้นที่กดให้ถึง 44px */
+    .sidebar-close { width: 44px; height: 44px; }
+}
+
+/* ===== จอแท็บเล็ต (769-1023px) =====
+   ช่วงนี้เคยไม่มี breakpoint เฉพาะ เลยถูกปฏิบัติเหมือนจอเดสก์ท็อปเต็มรูปแบบ (รวมโดน zoom 1.25 ข้างบนด้วย)
+   ทั้งที่แคบกว่ามาก ตอนนี้ตัดโซนนี้ออกจาก zoom แล้ว (zoom เริ่มที่ 1024px) จึงแสดงผลขนาดจริง 100% ในช่วงนี้ */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .admin-panel { padding: 32px 28px; }
 }
 /* ===== ป้ายหัวข้อในการ์ดสถิติ (กรอบเด่นๆ ตามภาพร่าง) ===== */
 .stat-label-badge {
@@ -1101,7 +1221,7 @@ a.stat-box { text-decoration: none; }
 }
 .student-topbar-actions a:hover { background: rgba(255,255,255,0.18); border-color: #fff; }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
     .student-topbar { padding: 24px 20px; gap: 16px; }
     .student-topbar-avatar, .student-topbar-avatar-fallback { width: 76px; height: 76px; font-size: 32px; }
     .student-topbar-name { font-size: 21px; }
