@@ -1,22 +1,101 @@
-# React + Vite
+# ระบบห้องพยาบาลออนไลน์ — ส่วนหน้าเว็บ
+วิทยาลัยเทคโนโลยีอุดมศึกษาพณิชยการ
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+ที่เก็บนี้เป็นหน้าเว็บของระบบห้องพยาบาล เขียนด้วย React ทำหน้าที่แสดงผลและรับข้อมูลจากผู้ใช้อย่างเดียว การอ่านเขียนฐานข้อมูลทั้งหมดอยู่ที่เซิร์ฟเวอร์อีกตัวหนึ่ง
 
-Currently, two official plugins are available:
+## เข้าใช้งานที่นี่
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### https://hospital-frontend-gray-one.vercel.app
 
-## React Compiler
+--------------------------------------------------
+## คู่มือและเอกสารทั้งหมด
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+อ่านได้ที่ที่เก็บฝั่งเซิร์ฟเวอร์ ซึ่งรวมทุกอย่างไว้ที่เดียว ทั้งคู่มือการใช้งานสำหรับพยาบาล การติดตั้ง โครงสร้างฐานข้อมูล และรายละเอียดทางเทคนิค
 
-## Expanding the Oxlint configuration
+### https://github.com/famozy3508-gif/hospitalback-end
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-"# hospitalfront-end" 
-"# hospitalfront-end" 
-"# hospitalfront-end" 
-"# hospital-frontend" 
-"# hospital-frontend" 
-"# hospital-frontend" 
+--------------------------------------------------
+## เริ่มพัฒนาอย่างเร็ว
+
+ต้องมี Node.js 18 ขึ้นไป
+
+```bash
+npm install
+npm run dev
+```
+
+เปิด `http://localhost:5173`
+
+ที่อยู่เซิร์ฟเวอร์อ่านจากตัวแปร `VITE_API_BASE` ถ้าไม่ได้กำหนดไว้จะใช้เซิร์ฟเวอร์จริงบน Render โดยอัตโนมัติ
+
+ถ้าจะให้ชี้มาที่เซิร์ฟเวอร์ในเครื่อง สร้างไฟล์ `.env.local` แล้วใส่บรรทัดนี้
+
+```
+VITE_API_BASE=http://localhost:8080/api
+```
+
+ไฟล์นี้ไม่ขึ้น git จึงไม่มีทางเผลอ push ค่า localhost ขึ้นไปทับเว็บจริง
+
+--------------------------------------------------
+## รันด้วย Docker
+
+ที่เก็บนี้มี `docker-compose.yml` ของตัวเอง ใช้ในกรณีที่ไม่อยากติดตั้ง Node ในเครื่อง
+
+```bash
+docker compose up -d
+```
+
+เปิด `http://localhost:5173`
+
+ครั้งแรกจะใช้เวลา 2-3 นาที เพราะต้องติดตั้ง `node_modules` ในคอนเทนเนอร์ ดูความคืบหน้าได้ด้วย `docker compose logs -f frontend`
+
+แก้โค้ดในเครื่องแล้วเห็นผลทันที ไม่ต้อง build ใหม่ เพราะ mount โฟลเดอร์เข้าไปตรงๆ
+
+### ต้องเปิดเซิร์ฟเวอร์ควบคู่ด้วย
+
+ที่เก็บนี้มีแต่หน้าเว็บ ถ้าเปิดอย่างเดียวจะล็อกอินไม่ได้และไม่มีข้อมูลอะไรแสดง เพราะไม่มีใครตอบ API ให้
+
+ต้องเปิดที่เก็บฝั่งเซิร์ฟเวอร์ควบคู่กันไป ซึ่งมี `docker-compose.yml` ของตัวเองเหมือนกัน
+
+```bash
+git clone https://github.com/famozy3508-gif/hospitalback-end.git backend
+cd backend
+docker compose up -d
+```
+
+เมื่อเปิดทั้งสองฝั่งแล้ว หน้าเว็บจะเรียก API ไปที่ `http://localhost:8080/api` ซึ่งตั้งค่าไว้ในไฟล์ compose ของที่เก็บนี้แล้ว ไม่ต้องแก้อะไรเพิ่ม
+
+--------------------------------------------------
+## เครื่องมือที่ใช้
+
+* React 18 กับ Vite
+* React Router สำหรับสลับหน้า
+* CSS เขียนเองทั้งหมด ไม่ได้ใช้ไลบรารีสำเร็จรูป ธีมอยู่ในไฟล์เดียวคือ `src/index.css`
+* ฟอนต์ Prompt สำหรับหัวข้อ และ Sarabun สำหรับเนื้อหา
+* กราฟทั้งหมดวาดด้วย CSS ล้วน ไม่ได้ติดตั้งไลบรารีกราฟเพิ่ม
+
+--------------------------------------------------
+## การนำขึ้นเซิร์ฟเวอร์
+
+Vercel ผูกกับที่เก็บนี้ไว้แล้ว push ขึ้น branch `main` เมื่อไหร่ ระบบจะ build และเผยแพร่ให้เองอัตโนมัติ
+
+| ช่อง | ค่า |
+| --- | --- |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Install Command | `npm install` |
+
+ไฟล์ `vercel.json` มีไว้แก้ปัญหาเฉพาะของเว็บแบบหน้าเดียว เวลาผู้ใช้กดรีเฟรชขณะอยู่หน้าอื่นที่ไม่ใช่หน้าแรก Vercel จะพยายามหาไฟล์ตามชื่อ URL นั้นแล้วไม่เจอ ขึ้น 404 ไฟล์นี้บอกให้ส่ง `index.html` กลับไปเสมอ แล้วปล่อยให้ React Router จัดการเอง
+
+ส่วน `Dockerfile` กับ `nginx.conf` ใช้เฉพาะตอนทำชุดส่งมอบแบบ offline ไม่เกี่ยวกับ Vercel
+
+--------------------------------------------------
+## สิ่งที่ควรรู้ก่อนแก้โค้ด
+
+* `src/api/client.js` เป็นจุดเดียวที่กำหนดที่อยู่เซิร์ฟเวอร์และแนบ token จะย้ายเซิร์ฟเวอร์ก็แก้ที่นี่ที่เดียว
+* เข้าสู่ระบบด้วย token เก็บใน `localStorage` ไม่ได้ใช้ cookie เพราะเบราว์เซอร์บนมือถือบล็อก cookie ข้ามโดเมน
+* `StatusModal` และ `LoadingScreen` ใช้ `createPortal` ย้ายตัวเองไปแปะที่ `body` เพราะกล่องแม่มี `backdrop-filter` ซึ่งทำให้ `position: fixed` ไม่ยึดกับหน้าจอ
+* `inline style` มีลำดับความสำคัญสูงกว่า media query เสมอ ถ้าเขียน `gridTemplateColumns` ไว้ใน JSX กฎมือถือจะไม่ทำงาน ให้ย้ายไปเป็น class แทน
+* ตารางที่ต้องการให้กลายเป็นการ์ดบนมือถือ ใส่ `className="responsive-table"` และใส่ `data-label` ให้ทุก `<td>`
+* จะเปลี่ยนสีหรือฟอนต์ทั้งระบบ แก้ตัวแปรที่บล็อก `:root` บนสุดของ `src/index.css`
+* จะเพิ่มหน้าใหม่ ต้องเพิ่มเส้นทางใน `App.jsx` และครอบด้วย `ProtectedRoute` ถ้าหน้านั้นต้องล็อกอินก่อน
