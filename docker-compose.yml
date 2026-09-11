@@ -1,0 +1,46 @@
+# docker-compose.yml (frontend)
+#
+# ชุดพัฒนาเฉพาะฝั่งหน้าเว็บ รันได้เองจากในโฟลเดอร์นี้ ไม่ต้องพึ่ง repo อื่น
+# วางอยู่ที่ราก repo นี้ (hospital-frontend/docker-compose.yml)
+#
+# ไม่มี service db หรือ backend อยู่ในไฟล์นี้ เพราะ backend เป็นคนละ repo แยกกัน
+# (repo hospitalback-end) ต้องเปิด backend ก่อน หน้าเว็บถึงจะเรียก API ได้จริง:
+#
+#   1. ไปที่โฟลเดอร์ backend (repo อีกตัว) แล้วสั่ง `docker compose up -d`
+#      ให้ได้ http://localhost:8080 (ดู README ของ repo นั้น)
+#   2. แล้วค่อยสั่ง `docker compose up -d` ที่โฟลเดอร์นี้
+#
+# ไม่เปิด backend ก่อน หน้าเว็บจะขึ้นมาได้ที่ http://localhost:5173 ตามปกติ
+# แต่ทุกหน้าที่เรียก API (ล็อกอิน ดูข้อมูล ฯลฯ) จะ error เพราะเรียก
+# http://localhost:8080 ไม่เจอ
+#
+# ===== เปิดใช้งาน =====
+#   http://localhost:5173   หน้าเว็บ
+#
+# ===== ชื่อที่จะเห็นใน Docker Desktop =====
+#
+#   Containers                Volumes
+#   └── hospital-frontend     └── hospital-frontend_node_modules
+
+services:
+  frontend:
+    image: node:20
+    container_name: hospital-frontend
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    environment:
+      # จำเป็นบน Windows ไม่งั้น Vite จับไม่ได้ว่าไฟล์ถูกแก้
+      CHOKIDAR_USEPOLLING: "true"
+      # ที่อยู่ backend API — ต้องเปิด backend (repo อีกตัว) ไว้ที่พอร์ตนี้ก่อน ดูหมายเหตุด้านบน
+      VITE_API_BASE: http://localhost:8080/api
+    volumes:
+      - .:/app
+      # แยก node_modules ของ Linux ออกจากของ Windows กันชนกัน
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  # node_modules ของหน้าเว็บ
+  frontend_node_modules:

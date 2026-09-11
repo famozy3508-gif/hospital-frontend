@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 .env.local
+
+# เผื่อกรณี build ชุด offline หรือคัดลอกไฟล์ข้าม repo มาไว้ที่นี่ (ดู backend/docker-compose.offline.yml)
+db/
+hospital-project.tar
