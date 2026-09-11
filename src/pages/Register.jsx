@@ -39,6 +39,16 @@ export default function Register() {
     setForm({ ...form, [key]: numericOnly });
   };
 
+  const handleUsernameChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9_.-]/g, '');
+    setForm({ ...form, username: filtered });
+  };
+
+  const handleEmailChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9@._+-]/g, '');
+    setForm({ ...form, email: filtered });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -91,10 +101,10 @@ export default function Register() {
         <input value={form.last_name} onChange={update('last_name')} placeholder="กรุณากรอกข้อมูล" required />
 
         <label>อีเมล</label>
-        <input type="email" value={form.email} onChange={update('email')} placeholder="กรุณากรอกอีเมล เช่น example@gmail.com" required />
+        <input type="email" value={form.email} onChange={handleEmailChange} placeholder="กรุณากรอกอีเมล เช่น example@gmail.com" required />
 
         <label>ชื่อผู้ใช้ (Username)</label>
-        <input maxLength={7} value={form.username} onChange={update('username')} placeholder="กรุณากรอกข้อมูล" required />
+        <input maxLength={7} value={form.username} onChange={handleUsernameChange} placeholder="กรุณากรอกข้อมูล" required />
 
         <label>รหัสผ่าน</label>
         <div style={{ position: 'relative' }}>

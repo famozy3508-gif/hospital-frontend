@@ -34,6 +34,16 @@ export default function Profile() {
     setForm({ ...form, phone: numericOnly });
   };
 
+  const handleBloodTypeChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z+-]/g, '').slice(0, 4);
+    setForm({ ...form, blood_type: filtered });
+  };
+
+  const handleEmailChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9@._+-]/g, '');
+    setForm({ ...form, email: filtered });
+  };
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) setCropperFile(file);
@@ -123,7 +133,7 @@ export default function Profile() {
         <input value={form.nickname || ''} onChange={update('nickname')} placeholder="เช่น สเตฟาน" />
 
         <label>อีเมล</label>
-        <input type="email" value={form.email || ''} onChange={update('email')} required />
+        <input type="email" value={form.email || ''} onChange={handleEmailChange} required />
 
         <label>เบอร์โทร</label>
         <input
@@ -137,7 +147,7 @@ export default function Profile() {
         />
 
         <label>กรุ๊ปเลือด</label>
-        <input maxLength={4} value={form.blood_type || ''} onChange={update('blood_type')} placeholder="เช่น A, B, AB, O" />
+        <input maxLength={4} value={form.blood_type || ''} onChange={handleBloodTypeChange} placeholder="เช่น A, B, AB, O" />
 
         <label>โรคประจำตัว</label>
         <input value={form.chronic_disease || ''} onChange={update('chronic_disease')} placeholder="ถ้าไม่มีให้เว้นว่างไว้" />

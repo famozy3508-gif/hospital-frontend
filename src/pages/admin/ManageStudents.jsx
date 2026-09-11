@@ -59,6 +59,31 @@ export default function ManageStudents() {
     setForm({ ...form, password: numericOnly });
   };
 
+  const handleUsernameChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9_.-]/g, '');
+    setForm({ ...form, username: filtered });
+  };
+
+  const handleFormStudentCodeChange = (e) => {
+    const numericOnly = e.target.value.replace(/[^0-9]/g, '').slice(0, 5);
+    setForm({ ...form, student_code: numericOnly });
+  };
+
+  const handleBloodTypeChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z+-]/g, '').slice(0, 4);
+    setForm({ ...form, blood_type: filtered });
+  };
+
+  const handlePhoneChange = (e) => {
+    const numericOnly = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+    setForm({ ...form, phone: numericOnly });
+  };
+
+  const handleEmailChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9@._+-]/g, '');
+    setForm({ ...form, email: filtered });
+  };
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) setCropperFile(file);
@@ -182,7 +207,7 @@ export default function ManageStudents() {
           )}
           <div>
             <label>ชื่อผู้ใช้ (Username)</label>
-            <input maxLength={7} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
+            <input maxLength={7} value={form.username} onChange={handleUsernameChange} required />
           </div>
           <div>
             <label>{editing ? 'รหัสผ่านใหม่ (เว้นว่าง = ไม่เปลี่ยน)' : 'รหัสผ่าน'}</label>
@@ -212,21 +237,35 @@ export default function ManageStudents() {
             <div className="field-row" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginTop: 8, marginBottom: 20 }}>
               <div>
                 <label>อีเมล</label>
-                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                <input type="email" value={form.email} onChange={handleEmailChange} />
               </div>
               <div>
                 <label>รหัสนักเรียน/นักศึกษา</label>
-                <input maxLength={5} value={form.student_code} onChange={(e) => setForm({ ...form, student_code: e.target.value })} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={5}
+                  value={form.student_code}
+                  onChange={handleFormStudentCodeChange}
+                />
               </div>
               {editing && (
                 <>
                   <div>
                     <label>เบอร์โทร</label>
-                    <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={10}
+                      value={form.phone}
+                      onChange={handlePhoneChange}
+                    />
                   </div>
                   <div>
                     <label>กรุ๊ปเลือด</label>
-                    <input maxLength={4} value={form.blood_type} onChange={(e) => setForm({ ...form, blood_type: e.target.value })} />
+                    <input maxLength={4} value={form.blood_type} onChange={handleBloodTypeChange} />
                   </div>
                   <div>
                     <label>โรคประจำตัว</label>
@@ -239,7 +278,7 @@ export default function ManageStudents() {
             <div className="field-row level-dept-row">
               <div>
                 <label>ระดับชั้น</label>
-                <select value={form.education_level} onChange={(e) => setForm({ ...form, education_level: e.target.value })}>
+                <select value={form.education_level} onChange={(e) => setForm({ ...form, education_level: e.target.value })} required>
                   <option value="">-- เลือกระดับชั้น --</option>
                   <option value="ปวช.">ปวช.</option>
                   <option value="ปวส.">ปวส.</option>
@@ -248,7 +287,7 @@ export default function ManageStudents() {
               </div>
               <div>
                 <label>สาขาวิชา</label>
-                <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })}>
+                <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} required>
                   <option value="">-- เลือกสาขาวิชา --</option>
                   {DEPT_LIST.map((d) => <option key={d} value={d}>{d}</option>)}
                 </select>

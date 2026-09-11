@@ -10,6 +10,11 @@ export default function DeleteAccount() {
   const { refresh } = useAuth();
   const navigate = useNavigate();
 
+  const handlePasswordChange = (e) => {
+    const numericOnly = e.target.value.replace(/[^0-9]/g, '');
+    setPassword(numericOnly);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!window.confirm('ยืนยันลบบัญชีถาวร? การกระทำนี้ไม่สามารถย้อนกลับได้')) return;
@@ -30,7 +35,7 @@ export default function DeleteAccount() {
       <p style={{ color: '#c53030', fontWeight: 'bold' }}>⚠️ คำเตือน: การลบบัญชีเป็นการดำเนินการถาวร ไม่สามารถกู้คืนได้</p>
       <form onSubmit={handleSubmit}>
         <label>กรุณาพิมพ์รหัสผ่านเพื่อยืนยันตัวตน</label>
-        <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={5} value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input type="text" inputMode="numeric" pattern="[0-9]*" maxLength={5} value={password} onChange={handlePasswordChange} required />
         <button type="submit" style={{ background: '#c53030' }}>ยืนยันลบบัญชีถาวร</button>
       </form>
       <Link to="/student/profile" style={{ display: 'block', marginTop: 20 }}>« ยกเลิก กลับไปหน้าข้อมูลส่วนตัว</Link>

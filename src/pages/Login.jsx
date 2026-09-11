@@ -40,6 +40,11 @@ export default function Login() {
     }
   };
 
+  const handleUsernameChange = (e) => {
+    const filtered = e.target.value.replace(/[^A-Za-z0-9_.-]/g, '');
+    setUsername(filtered);
+  };
+
   const handlePasswordChange = (e) => {
     const numericOnly = e.target.value.replace(/[^0-9]/g, '');
     setPassword(numericOnly);
@@ -63,7 +68,7 @@ export default function Login() {
           type="text"
           maxLength={7}
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={handleUsernameChange}
           placeholder="กรุณากรอกชื่อผู้ใช้"
           required
         />
