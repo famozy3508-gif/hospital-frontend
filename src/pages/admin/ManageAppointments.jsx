@@ -251,8 +251,8 @@ export default function ManageAppointments() {
 
         <div className="reason-field-wide">
           <label>เหตุผล</label>
-          <input value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} maxLength={255} />
-          <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.reason.length}/255 ตัวอักษร</p>
+          <input value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} maxLength={500} />
+          <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.reason.length}/500 ตัวอักษร</p>
         </div>
 
         <div style={{ maxWidth: 300, marginBottom: 20 }}>
@@ -365,11 +365,11 @@ export default function ManageAppointments() {
 
         <div className="reason-field-wide">
           <label>เหตุผล</label>
-          {/* จำกัดแค่ 191 ตัวอักษร (ไม่ใช่ 255 เต็มคอลัมน์) เพราะตอนสร้างนัดหมายระบบจะประกอบข้อความแจ้งเตือน
-              อัตโนมัติจาก prefix คงที่ (64 ตัวอักษร) + เหตุผลนี้ ลงคอลัมน์ tb_notifications.message ที่จำกัด 255
-              ตัวอักษรเหมือนกัน ต้องเผื่อพื้นที่ไว้ไม่งั้นข้อความแจ้งเตือนจะถูกตัดทอน (ดู manage_appointments.php) */}
-          <input value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} placeholder="เช่น ติดตามอาการ, ตรวจสุขภาพประจำปี" maxLength={191} />
-          <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.reason.length}/191 ตัวอักษร (เผื่อพื้นที่ให้ข้อความแจ้งเตือนอัตโนมัติ)</p>
+          {/* ใช้ 500 ตัวอักษรเท่ากับฟอร์มแก้ไข (ไม่ให้ผู้ใช้งงว่าทำไมสองฟอร์มจำกัดไม่เท่ากัน) ฝั่ง backend ยังเช็คซ้ำ
+              แบบเผื่อ prefix ข้อความแจ้งเตือนอัตโนมัติอยู่ (ดู manage_appointments.php) เผื่อวันหลังมีคนแก้ข้อความ
+              prefix ให้ยาวขึ้นจนพื้นที่เหลือใน tb_notifications.message (600) น้อยกว่า 500 ของคอลัมน์ reason เอง */}
+          <input value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} placeholder="เช่น ติดตามอาการ, ตรวจสุขภาพประจำปี" maxLength={500} />
+          <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.reason.length}/500 ตัวอักษร</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

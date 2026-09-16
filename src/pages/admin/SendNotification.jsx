@@ -203,8 +203,8 @@ export default function SendNotification() {
 
               <div className="reason-field-wide">
                 <label>ข้อความแจ้งเตือน</label>
-                <input value={broadcastMessage} onChange={(e) => setBroadcastMessage(e.target.value)} placeholder="เช่น กรุณามาพบห้องพยาบาลเพื่อรับยาต่อเนื่อง" maxLength={255} required />
-                <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{broadcastMessage.length}/255 ตัวอักษร</p>
+                <input value={broadcastMessage} onChange={(e) => setBroadcastMessage(e.target.value)} placeholder="เช่น กรุณามาพบห้องพยาบาลเพื่อรับยาต่อเนื่อง" maxLength={600} required />
+                <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{broadcastMessage.length}/600 ตัวอักษร</p>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -264,8 +264,8 @@ export default function SendNotification() {
 
                 <div className="reason-field-wide">
                   <label>ข้อความแจ้งเตือน</label>
-                  <input value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="เช่น กรุณามาพบห้องพยาบาลเพื่อรับยาต่อเนื่อง" maxLength={255} />
-                  <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.message.length}/255 ตัวอักษร</p>
+                  <input value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="เช่น กรุณามาพบห้องพยาบาลเพื่อรับยาต่อเนื่อง" maxLength={600} />
+                  <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.message.length}/600 ตัวอักษร</p>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -45,8 +45,8 @@ export default function Allergy() {
 
       <form onSubmit={handleSubmit}>
         <label>ชื่อยา/สารที่แพ้</label>
-        <input value={form.allergy_name} onChange={(e) => setForm({ ...form, allergy_name: e.target.value })} maxLength={100} required />
-        <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.allergy_name.length}/100 ตัวอักษร</p>
+        <input value={form.allergy_name} onChange={(e) => setForm({ ...form, allergy_name: e.target.value })} maxLength={255} required />
+        <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.allergy_name.length}/255 ตัวอักษร</p>
 
         <label>อาการที่เกิดขึ้น</label>
         <input value={form.reaction} onChange={(e) => setForm({ ...form, reaction: e.target.value })} placeholder="เช่น ผื่นคัน, หายใจลำบาก" maxLength={255} />
