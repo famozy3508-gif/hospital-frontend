@@ -162,7 +162,8 @@ export default function ManageVisits() {
         <input value={form.treatment} onChange={(e) => setForm({ ...form, treatment: e.target.value })} />
 
         <label>ยาที่ได้รับ</label>
-        <input value={form.medicine_given} onChange={(e) => setForm({ ...form, medicine_given: e.target.value })} />
+        <input value={form.medicine_given} onChange={(e) => setForm({ ...form, medicine_given: e.target.value })} maxLength={255} />
+        <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{form.medicine_given.length}/255 ตัวอักษร</p>
 
         <label>หมายเหตุ</label>
         <input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />

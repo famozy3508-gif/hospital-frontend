@@ -96,9 +96,11 @@ export default function SearchHistory() {
           <strong>แก้ไขรายการแพ้ยา</strong>
           <form onSubmit={handleAllergySubmit} style={{ marginTop: 10 }}>
             <label>ชื่อยา/สารที่แพ้</label>
-            <input value={allergyForm.allergy_name} onChange={(e) => setAllergyForm({ ...allergyForm, allergy_name: e.target.value })} required />
+            <input value={allergyForm.allergy_name} onChange={(e) => setAllergyForm({ ...allergyForm, allergy_name: e.target.value })} maxLength={100} required />
+            <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{allergyForm.allergy_name.length}/100 ตัวอักษร</p>
             <label>อาการที่เกิดขึ้น</label>
-            <input value={allergyForm.reaction} onChange={(e) => setAllergyForm({ ...allergyForm, reaction: e.target.value })} />
+            <input value={allergyForm.reaction} onChange={(e) => setAllergyForm({ ...allergyForm, reaction: e.target.value })} maxLength={255} />
+            <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{allergyForm.reaction.length}/255 ตัวอักษร</p>
             <label>ความรุนแรง</label>
             <select value={allergyForm.severity} onChange={(e) => setAllergyForm({ ...allergyForm, severity: e.target.value })}>
               <option value="mild">เล็กน้อย</option>
@@ -114,9 +116,11 @@ export default function SearchHistory() {
           <strong>เพิ่มรายการแพ้ยาใหม่</strong>
           <form onSubmit={handleAllergySubmit} style={{ marginTop: 10 }}>
             <label>ชื่อยา/สารที่แพ้</label>
-            <input value={allergyForm.allergy_name} onChange={(e) => setAllergyForm({ ...allergyForm, allergy_name: e.target.value })} placeholder="เช่น เพนิซิลลิน" required />
+            <input value={allergyForm.allergy_name} onChange={(e) => setAllergyForm({ ...allergyForm, allergy_name: e.target.value })} placeholder="เช่น เพนิซิลลิน" maxLength={100} required />
+            <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{allergyForm.allergy_name.length}/100 ตัวอักษร</p>
             <label>อาการที่เกิดขึ้น</label>
-            <input value={allergyForm.reaction} onChange={(e) => setAllergyForm({ ...allergyForm, reaction: e.target.value })} placeholder="เช่น ผื่นคัน" />
+            <input value={allergyForm.reaction} onChange={(e) => setAllergyForm({ ...allergyForm, reaction: e.target.value })} placeholder="เช่น ผื่นคัน" maxLength={255} />
+            <p style={{ fontSize: 12, color: '#888', margin: '2px 0 8px' }}>{allergyForm.reaction.length}/255 ตัวอักษร</p>
             <label>ความรุนแรง</label>
             <select value={allergyForm.severity} onChange={(e) => setAllergyForm({ ...allergyForm, severity: e.target.value })}>
               <option value="mild">เล็กน้อย</option>
