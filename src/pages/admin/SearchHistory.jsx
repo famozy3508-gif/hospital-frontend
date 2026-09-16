@@ -83,7 +83,7 @@ export default function SearchHistory() {
 
       <h3>ข้อมูลนักเรียน</h3>
       <div className="info-box">
-        <strong>{student.student_code} - {student.first_name} {student.last_name}</strong><br />
+        <strong>{student.student_code} - {student.first_name} {student.last_name}{student.nickname ? ` (${student.nickname})` : ''}</strong><br />
         ระดับชั้น/สาขา: {student.education_level || '-'} {student.department || ''}<br />
         กรุ๊ปเลือด: {student.blood_type || '-'} | โรคประจำตัว: {student.chronic_disease || 'ไม่มี'}<br />
         เบอร์โทร: {student.phone || '-'} | อีเมล: {student.email || '-'}
