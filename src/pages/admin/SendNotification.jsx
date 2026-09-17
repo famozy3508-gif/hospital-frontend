@@ -32,6 +32,7 @@ export default function SendNotification() {
   // ===== เลือกหลายรายการในลิสต์ "แจ้งเตือนที่ส่งล่าสุด" เพื่อลบทีเดียว =====
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [confirmDelete, setConfirmDelete] = useState(null); // null ปิดอยู่ | { type: 'single', id } | { type: 'bulk' }
+  const [confirmBroadcast, setConfirmBroadcast] = useState(false);
   const selectAllRef = useRef(null);
 
   // ===== รายการแจ้งเตือนที่ "รอส่ง" (ตะกร้า) — เพิ่มได้หลายคน แล้วค่อยกดส่งทีเดียว (โหมดส่งเป็นประกาศไม่ใช้ตะกร้านี้) =====
@@ -167,10 +168,13 @@ export default function SendNotification() {
   };
 
   // ===== โหมดส่งเป็นประกาศให้ทุกคน (ส่งทันทีทีละครั้ง ไม่ใช้ตะกร้า) =====
-  const handleBroadcastSubmit = async (e) => {
+  const handleBroadcastSubmit = (e) => {
     e.preventDefault();
-    if (!window.confirm('ยืนยันส่งประกาศนี้ถึงนักเรียนทุกคนที่มีอีเมลในระบบ?\n\nการกระทำนี้จะส่งอีเมลจริงไปหาทุกคนทันที')) return;
+    setConfirmBroadcast(true);
+  };
 
+  const runBroadcast = async () => {
+    setConfirmBroadcast(false);
     setModalStatus('loading');
     setModalMessage('');
     try {
@@ -252,6 +256,16 @@ export default function SendNotification() {
         cancelText="ยกเลิก"
         onCancel={() => setConfirmDelete(null)}
         onConfirm={runConfirmedDelete}
+      />
+
+      <ConfirmModal
+        open={confirmBroadcast}
+        title="ยืนยันส่งประกาศ"
+        message={'ยืนยันส่งประกาศนี้ถึงนักเรียนทุกคนที่มีอีเมลในระบบ?\n\nการกระทำนี้จะส่งอีเมลจริงไปหาทุกคนทันที'}
+        confirmText="ส่งประกาศ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmBroadcast(false)}
+        onConfirm={runBroadcast}
       />
 
       {!showForm && (

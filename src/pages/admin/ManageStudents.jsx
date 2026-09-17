@@ -5,6 +5,7 @@ import { api, avatarUrl, FIELD_PATTERNS } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
 import StatusModal from '../../components/StatusModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -32,6 +33,7 @@ export default function ManageStudents() {
   const [cropperFile, setCropperFile] = useState(null);
   const [modalStatus, setModalStatus] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -157,8 +159,10 @@ export default function ManageStudents() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('ยืนยันลบสมาชิกคนนี้?')) return;
+  const handleDelete = (id) => setConfirmDeleteId(id);
+  const confirmDelete = async () => {
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     try {
       const res = await api.del(`/admin/manage_students.php?id=${id}`);
       showSuccessPopup(res.message);
@@ -346,6 +350,15 @@ export default function ManageStudents() {
   return (
     <div className="admin-panel">
       <ImageCropper file={cropperFile} onCancel={() => setCropperFile(null)} onConfirm={handleCropConfirm} />
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="ยืนยันลบสมาชิก"
+        message="ยืนยันลบสมาชิกคนนี้? การลบนี้กู้คืนไม่ได้"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
       <StatusModal
         status={modalStatus}
         message={modalMessage}

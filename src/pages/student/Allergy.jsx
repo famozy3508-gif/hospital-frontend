@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const SEVERITY_LABEL = { mild: 'เล็กน้อย', moderate: 'ปานกลาง', severe: 'รุนแรง' };
 
@@ -10,6 +11,7 @@ export default function Allergy() {
   const [form, setForm] = useState({ allergy_name: '', reaction: '', severity: 'mild' });
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const load = () => api.get('/student/allergy.php').then(setList);
   useEffect(() => { load(); }, []);
@@ -27,14 +29,26 @@ export default function Allergy() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('ยืนยันลบรายการนี้?')) return;
+  const handleDelete = (id) => setConfirmDeleteId(id);
+  const confirmDelete = async () => {
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     await api.del(`/student/allergy.php?id=${id}`);
     load();
   };
 
   return (
     <div className="form-container">
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="ยืนยันลบรายการ"
+        message="ยืนยันลบรายการนี้? การลบนี้กู้คืนไม่ได้"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
+
       <Link to="/student/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>
         « ย้อนกลับ
       </Link>

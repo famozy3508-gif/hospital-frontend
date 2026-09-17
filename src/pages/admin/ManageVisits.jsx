@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -27,6 +28,7 @@ export default function ManageVisits() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const loadStudentsForPicker = (f = {}) => {
     const qs = new URLSearchParams({ mode: 'students', ...f }).toString();
@@ -98,8 +100,10 @@ export default function ManageVisits() {
   const cancelEdit = () => { setEditing(null); setForm(emptyForm); };
   const cancelAdd = () => { setShowAddForm(false); setForm(emptyForm); clearPickerSearch(); };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('ยืนยันลบรายการนี้?')) return;
+  const handleDelete = (id) => setConfirmDeleteId(id);
+  const confirmDelete = async () => {
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
     await api.del(`/admin/manage_visits.php?id=${id}`);
     loadVisits(hasSearched ? filters : {});
   };
@@ -178,6 +182,16 @@ export default function ManageVisits() {
 
   return (
     <div className="admin-panel">
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="ยืนยันลบรายการ"
+        message="ยืนยันลบรายการนี้? การลบนี้กู้คืนไม่ได้"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
+
       {!(editing || showAddForm) && (
         <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
       )}

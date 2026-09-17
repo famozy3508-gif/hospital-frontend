@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client';
 import StatusModal from '../../components/StatusModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -34,6 +35,7 @@ export default function ManageAppointments() {
   const [success, setSuccess] = useState('');
   const [modalStatus, setModalStatus] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
+  const [confirmAction, setConfirmAction] = useState(null); // { title, message, run } | null
 
   // ===== รายการนัดหมายที่ "รอสร้าง" (ตะกร้า) — เพิ่มได้หลายคน แล้วค่อยกดสร้างทีเดียว =====
   const [draftList, setDraftList] = useState([]);
@@ -198,16 +200,32 @@ export default function ManageAppointments() {
     clearPickerSearch();
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('ยืนยันลบนัดหมายนี้?')) return;
-    await api.del(`/admin/manage_appointments.php?id=${id}`);
-    loadAppointments(hasSearched ? filters : {});
+  const handleDelete = (id) => {
+    setConfirmAction({
+      title: 'ยืนยันลบนัดหมาย',
+      message: 'ยืนยันลบนัดหมายนี้? การลบนี้กู้คืนไม่ได้',
+      run: async () => {
+        await api.del(`/admin/manage_appointments.php?id=${id}`);
+        loadAppointments(hasSearched ? filters : {});
+      },
+    });
   };
 
-  const changeStatus = async (id, action, confirmMsg) => {
-    if (!window.confirm(confirmMsg)) return;
-    await api.post('/admin/manage_appointments.php', { action, appointment_id: id });
-    loadAppointments(hasSearched ? filters : {});
+  const changeStatus = (id, action, confirmMsg) => {
+    setConfirmAction({
+      title: 'ยืนยันการทำรายการ',
+      message: confirmMsg,
+      run: async () => {
+        await api.post('/admin/manage_appointments.php', { action, appointment_id: id });
+        loadAppointments(hasSearched ? filters : {});
+      },
+    });
+  };
+
+  const runConfirmAction = async () => {
+    const action = confirmAction;
+    setConfirmAction(null);
+    if (action) await action.run();
   };
 
   const renderEditForm = () => (
@@ -411,6 +429,15 @@ export default function ManageAppointments() {
   return (
     <div className="admin-panel">
       <StatusModal status={modalStatus} message={modalMessage} onClose={() => setModalStatus(null)} />
+      <ConfirmModal
+        open={!!confirmAction}
+        title={confirmAction?.title || 'ยืนยันการทำรายการ'}
+        message={confirmAction?.message || ''}
+        confirmText="ยืนยัน"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={runConfirmAction}
+      />
 
       {!(editing || showAddForm) && (
         <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>

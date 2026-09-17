@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, API_BASE, avatarUrl, getToken } from '../../api/client';
 import LoadingScreen from '../../components/LoadingScreen';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const SEVERITY_LABEL = { mild: 'เล็กน้อย', moderate: 'ปานกลาง', severe: 'รุนแรง' };
 const STATUS_LABEL = { pending: 'รอถึงกำหนด', completed: 'เสร็จสิ้นแล้ว', cancelled: 'ยกเลิกแล้ว' };
@@ -15,6 +16,7 @@ export default function SearchHistory() {
   const [allergyForm, setAllergyForm] = useState({ allergy_name: '', reaction: '', severity: 'mild' });
   const [editingAllergy, setEditingAllergy] = useState(null);
   const [msg, setMsg] = useState('');
+  const [confirmDeleteAllergyId, setConfirmDeleteAllergyId] = useState(null);
 
   const loadDetail = (id) => api.get(`/admin/search_history.php?view=${id}`).then(setDetail);
 
@@ -46,8 +48,10 @@ export default function SearchHistory() {
     setAllergyForm({ allergy_name: a.allergy_name, reaction: a.reaction, severity: a.severity });
   };
 
-  const deleteAllergy = async (id) => {
-    if (!window.confirm('ยืนยันลบรายการแพ้ยานี้?')) return;
+  const deleteAllergy = (id) => setConfirmDeleteAllergyId(id);
+  const confirmDeleteAllergy = async () => {
+    const id = confirmDeleteAllergyId;
+    setConfirmDeleteAllergyId(null);
     await api.del(`/admin/search_history.php?allergy_id=${id}`);
     loadDetail(viewId);
   };
@@ -58,6 +62,16 @@ export default function SearchHistory() {
 
   return (
     <div className="form-container" style={{ maxWidth: 750 }}>
+      <ConfirmModal
+        open={confirmDeleteAllergyId !== null}
+        title="ยืนยันลบรายการแพ้ยา"
+        message="ยืนยันลบรายการแพ้ยานี้? การลบนี้กู้คืนไม่ได้"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmDeleteAllergyId(null)}
+        onConfirm={confirmDeleteAllergy}
+      />
+
       <Link to="/admin/manage-students" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>
         « กลับไปดูรายชื่อทั้งหมด
       </Link>
