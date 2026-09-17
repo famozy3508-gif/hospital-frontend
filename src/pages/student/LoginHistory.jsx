@@ -16,12 +16,11 @@ export default function LoginHistory() {
       <h2>ประวัติการเข้าใช้งานระบบ</h2>
       {list.length === 0 ? <p>ไม่พบประวัติการเข้าใช้งาน</p> : (
         <table style={{ width: '100%' }}>
-          <thead><tr><th>วันเวลาเข้าใช้</th><th>IP Address</th></tr></thead>
+          <thead><tr><th>วันเวลาเข้าใช้</th></tr></thead>
           <tbody>
             {list.map((l) => (
               <tr key={l.log_id}>
                 <td>{new Date(l.login_time).toLocaleString('th-TH')}</td>
-                <td>{l.ip_address}</td>
               </tr>
             ))}
           </tbody>
