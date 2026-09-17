@@ -548,6 +548,78 @@ a.btn-delete-row:hover { background: #FBDEDE; }
     gap: 16px;
 }
 
+/* ===== แถวแจ้งเตือนที่ส่งแล้ว (SendNotification.jsx): checkbox เลือกหลายรายการเพื่อลบทีเดียว =====
+   ใช้ class เฉพาะ (.notif-row) แทนการแก้ .list-item-row ตรงๆ เพราะ .list-item-row ถูกใช้ร่วมกับ
+   หน้าอื่น (ตะกร้านัดหมาย/แจ้งเตือน, ประวัติการเข้ารับบริการ) ที่ไม่มี checkbox ไม่อยากกระทบของเดิม */
+.notif-row-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+.notif-checkbox-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding-top: 2px;
+    cursor: pointer;
+}
+.notif-checkbox-wrap input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.list-item-row.notif-row {
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.list-item-row.notif-row.selected {
+    border-color: var(--blue);
+    background: var(--blue-light);
+    box-shadow: 0 6px 18px rgba(43,108,176,0.18);
+}
+
+/* ===== แถบ "เลือกทั้งหมด" + ปุ่มลบที่เลือกไว้ (หัวลิสต์แจ้งเตือนที่ส่งแล้ว) ===== */
+.select-all-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.select-all-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14.5px;
+}
+.select-all-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.btn-delete-selected {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1.5px solid var(--error);
+    background: var(--error-bg);
+    color: var(--error);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+.btn-delete-selected:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.btn-delete-selected:not(:disabled):hover {
+    background: #FBDEDE;
+}
+
 /* ===== ช่องเหตุผลนัดหมาย ให้กว้างเต็มแถว ===== */
 .reason-field-wide {
     width: 100%;
@@ -1126,6 +1198,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
     /* ปุ่มปิดเมนู sidebar: ขยายพื้นที่กดให้ถึง 44px */
     .sidebar-close { width: 44px; height: 44px; }
+
+    /* checkbox เลือกแจ้งเตือน (เดี่ยว + เลือกทั้งหมด): ขยายพื้นที่กดให้ถึง 44px ตามเกณฑ์ touch target บนมือถือ */
+    .notif-checkbox-wrap { min-width: 44px; min-height: 44px; }
+    .select-all-row label { min-height: 44px; }
+    .btn-delete-selected { min-height: 44px; width: 100%; }
+    .select-all-row { flex-direction: column; align-items: stretch; }
 }
 
 /* ===== จอแท็บเล็ต (769-1023px) =====
@@ -1314,6 +1392,7 @@ a.stat-box { text-decoration: none; }
     color: var(--muted);
     line-height: 1.6;
     margin: 0 0 26px;
+    white-space: pre-line;
 }
 .confirm-modal-actions {
     display: flex;

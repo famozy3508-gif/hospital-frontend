@@ -1,8 +1,9 @@
 // src/pages/admin/SendNotification.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client';
 import StatusModal from '../../components/StatusModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const DEPT_LIST = [
   'สาขาวิชาการบัญชี', 'สาขาวิชาการตลาด', 'สาขาวิชาเทคโนโลยีธุรกิจดิจิทัล',
@@ -28,6 +29,11 @@ export default function SendNotification() {
   const [modalStatus, setModalStatus] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
 
+  // ===== เลือกหลายรายการในลิสต์ "แจ้งเตือนที่ส่งล่าสุด" เพื่อลบทีเดียว =====
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(null); // null ปิดอยู่ | { type: 'single', id } | { type: 'bulk' }
+  const selectAllRef = useRef(null);
+
   // ===== รายการแจ้งเตือนที่ "รอส่ง" (ตะกร้า) — เพิ่มได้หลายคน แล้วค่อยกดส่งทีเดียว (โหมดส่งเป็นประกาศไม่ใช้ตะกร้านี้) =====
   const [draftList, setDraftList] = useState([]);
   const [editingDraftId, setEditingDraftId] = useState(null); // null = กำลังเพิ่มใหม่, ไม่ null = กำลังแก้ไขรายการในตะกร้า
@@ -38,6 +44,26 @@ export default function SendNotification() {
   };
   const loadNotifications = () => api.get('/admin/send_notification.php').then(setNotifications);
   useEffect(() => { loadStudentsForPicker(); loadNotifications(); }, []);
+
+  // ===== เลือกหลายรายการ =====
+  const isAllSelected = notifications.length > 0 && selectedIds.size === notifications.length;
+  const isPartiallySelected = selectedIds.size > 0 && !isAllSelected;
+
+  // checkbox "เลือกทั้งหมด" ต้องขึ้นสถานะ indeterminate (ติ๊กบางส่วน) ซึ่ง React ไม่มี prop ให้ตั้งตรงๆ ต้องตั้งผ่าน DOM ref
+  useEffect(() => {
+    if (selectAllRef.current) selectAllRef.current.indeterminate = isPartiallySelected;
+  }, [isPartiallySelected]);
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    setSelectedIds(isAllSelected ? new Set() : new Set(notifications.map((n) => n.notification_id)));
+  };
 
   const handlePickerCode = (e) => {
     const numericOnly = e.target.value.replace(/[^0-9]/g, '').slice(0, 5);
@@ -170,15 +196,63 @@ export default function SendNotification() {
     clearPickerSearch();
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('ยืนยันลบแจ้งเตือนนี้?')) return;
-    await api.del(`/admin/send_notification.php?id=${id}`);
+  const handleDelete = (id) => setConfirmDelete({ type: 'single', id });
+
+  const handleBulkDeleteClick = () => {
+    if (selectedIds.size === 0) return;
+    setConfirmDelete({ type: 'bulk' });
+  };
+
+  const runConfirmedDelete = async () => {
+    if (!confirmDelete) return;
+    if (confirmDelete.type === 'single') {
+      setConfirmDelete(null);
+      await api.del(`/admin/send_notification.php?id=${confirmDelete.id}`);
+      // เผื่อ id ที่เพิ่งลบเคยถูกติ๊กไว้ในโหมดเลือกหลายรายการด้วย เคลียร์ทิ้งกันเลือกค้างผิดรายการ
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(confirmDelete.id);
+        return next;
+      });
+      loadNotifications();
+      return;
+    }
+
+    // bulk
+    const idsToDelete = [...selectedIds];
+    setConfirmDelete(null);
+    setModalStatus('loading');
+    setModalMessage('');
+    try {
+      const res = await api.del('/admin/send_notification.php', { ids: idsToDelete });
+      setModalStatus('success');
+      setModalMessage(res.message || `ลบแจ้งเตือนเรียบร้อยแล้ว (${idsToDelete.length} รายการ)`);
+    } catch (err) {
+      setModalStatus('error');
+      setModalMessage(err.message || 'เกิดข้อผิดพลาด เนื่องจากข้อมูลไม่ถูกต้องหรือผิดพลาด กรุณาลองใหม่');
+    }
+    // เคลียร์รายการที่เลือกไว้เสมอไม่ว่าจะสำเร็จหรือพลาดบางส่วน กัน id เดิมถูกนำกลับมาใช้ซ้ำในอนาคตแล้วติ๊กค้างผิดรายการ
+    setSelectedIds(new Set());
     loadNotifications();
   };
 
   return (
     <div className="admin-panel">
       <StatusModal status={modalStatus} message={modalMessage} onClose={() => setModalStatus(null)} />
+
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="ยืนยันลบแจ้งเตือน"
+        message={
+          confirmDelete?.type === 'bulk'
+            ? `ยืนยันลบแจ้งเตือนที่เลือกไว้ ${selectedIds.size} รายการ?\n\nนักเรียนเจ้าของบัญชีจะไม่เห็นแจ้งเตือนเหล่านี้อีก การลบนี้กู้คืนไม่ได้`
+            : 'ยืนยันลบแจ้งเตือนนี้?\n\nนักเรียนเจ้าของบัญชีจะไม่เห็นแจ้งเตือนนี้อีก การลบนี้กู้คืนไม่ได้'
+        }
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={runConfirmedDelete}
+      />
 
       {!showForm && (
         <Link to="/admin/dashboard" className="btn-back-panel" style={{ display: 'inline-block', marginBottom: 20 }}>« ย้อนกลับ</Link>
@@ -317,11 +391,43 @@ export default function SendNotification() {
             </div>
           </h3>
 
+          {notifications.length > 0 && (
+            <div className="select-all-row">
+              <label>
+                <input
+                  type="checkbox"
+                  ref={selectAllRef}
+                  checked={isAllSelected}
+                  onChange={toggleSelectAll}
+                />
+                เลือกทั้งหมด{selectedIds.size > 0 && ` (เลือกแล้ว ${selectedIds.size}/${notifications.length} รายการ)`}
+              </label>
+              <button
+                type="button"
+                className="btn-delete-selected"
+                disabled={selectedIds.size === 0}
+                onClick={handleBulkDeleteClick}
+              >
+                🗑️ ลบ {selectedIds.size} รายการที่เลือก
+              </button>
+            </div>
+          )}
+
           {notifications.length === 0 ? <p>ยังไม่มีแจ้งเตือนที่ส่ง</p> : notifications.map((n) => (
-            <div className="info-box list-item-row" key={n.notification_id}>
-              <div>
-                🔔 {n.message}<br />
-                ถึง: <strong>{n.student_code} {n.first_name} {n.last_name}</strong> | <small>{new Date(n.created_at).toLocaleString('th-TH')} น.</small> | {n.is_read ? '✅ อ่านแล้ว' : '⬜ ยังไม่อ่าน'}
+            <div className={`info-box list-item-row notif-row ${selectedIds.has(n.notification_id) ? 'selected' : ''}`} key={n.notification_id}>
+              <div className="notif-row-body">
+                <label className="notif-checkbox-wrap">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(n.notification_id)}
+                    onChange={() => toggleSelect(n.notification_id)}
+                    aria-label={`เลือกแจ้งเตือนถึง ${n.student_code} ${n.first_name} ${n.last_name}`}
+                  />
+                </label>
+                <div>
+                  🔔 {n.message}<br />
+                  ถึง: <strong>{n.student_code} {n.first_name} {n.last_name}</strong> | <small>{new Date(n.created_at).toLocaleString('th-TH')} น.</small> | {n.is_read ? '✅ อ่านแล้ว' : '⬜ ยังไม่อ่าน'}
+                </div>
               </div>
               <a href="#" className="btn-delete-row" onClick={(e) => { e.preventDefault(); handleDelete(n.notification_id); }}>ลบ</a>
             </div>

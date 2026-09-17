@@ -86,7 +86,8 @@ export const FIELD_PATTERNS = {
 export const api = {
   get: (path) => request(path, { method: 'GET' }),
   post: (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) }),
-  del: (path) => request(path, { method: 'DELETE' }),
+  // body เป็น optional (ใช้ตอนลบหลายรายการทีเดียว เช่น { ids: [1,2,3] }) - ไม่ใส่ก็ยังทำงานแบบเดิม
+  del: (path, body) => request(path, { method: 'DELETE', ...(body !== undefined ? { body: JSON.stringify(body) } : {}) }),
   // เช็คว่า field (username/student_code/email) นี้ถูกใช้ไปแล้วหรือยัง - ไม่ต้องล็อกอิน
   checkAvailable: (field, value) => request('/auth/check_available.php', { method: 'POST', body: JSON.stringify({ field, value }) }),
   // อัปโหลดไฟล์แบบ multipart/form-data (ใช้กับรูปโปรไฟล์)
