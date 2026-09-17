@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
+import StatusModal from '../components/StatusModal';
 
 function EyeIcon() {
   return (
@@ -29,7 +30,8 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [modalStatus, setModalStatus] = useState(null);
+  const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
 
   const update = (key) => (e) => setForm({ ...form, [key]: e.target.value });
@@ -54,7 +56,8 @@ export default function Register() {
     setError('');
     try {
       const data = await api.post('/auth/register.php', form);
-      setSuccess(data.message);
+      setModalStatus('success');
+      setModalMessage(data.message || 'สมัครสมาชิกเรียบร้อยแล้ว');
     } catch (err) {
       setError(err.message);
     }
@@ -67,18 +70,17 @@ export default function Register() {
     background: 'transparent', border: 'none', boxShadow: 'none', cursor: 'pointer',
   };
 
-  if (success) {
-    return (
-      <div className="form-container">
-        <h2>สมัครสมาชิก (นักเรียน/นักศึกษา)</h2>
-        <p className="alert-success">{success}</p>
-        <p><Link to="/login">ไปหน้าเข้าสู่ระบบ</Link></p>
-      </div>
-    );
-  }
-
   return (
     <div className="form-container">
+      <StatusModal
+        status={modalStatus}
+        message={modalMessage}
+        onClose={() => setModalStatus(null)}
+        hideConfirmButton
+        autoCloseMs={1800}
+        onAutoClose={() => navigate('/login')}
+      />
+
       <h2>สมัครสมาชิก (นักเรียน/นักศึกษา)</h2>
       {error && <p className="alert-error">{error}</p>}
       <form onSubmit={handleSubmit}>
