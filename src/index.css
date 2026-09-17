@@ -132,6 +132,20 @@ body::before {
     box-shadow: 0 0 0 4px rgba(43,108,176,0.15);
 }
 .form-container input:disabled { background: var(--panel); color: #9AA0A6; }
+.form-container input.input-error,
+.form-container select.input-error {
+    border-color: var(--error);
+}
+.form-container input.input-error:focus,
+.form-container select.input-error:focus {
+    box-shadow: 0 0 0 4px rgba(197,48,48,0.15);
+}
+.field-error-text {
+    color: var(--error);
+    font-size: 13.5px;
+    font-weight: 600;
+    margin: 6px 0 0;
+}
 
 .form-container button {
     width: 100%;

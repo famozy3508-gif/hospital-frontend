@@ -1,7 +1,7 @@
 // src/pages/admin/ManageStudents.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, avatarUrl } from '../../api/client';
+import { api, avatarUrl, FIELD_PATTERNS } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
 import StatusModal from '../../components/StatusModal';
@@ -26,6 +26,7 @@ export default function ManageStudents() {
   const [editing, setEditing] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({ username: '', student_code: '', email: '' });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState('');
   const [cropperFile, setCropperFile] = useState(null);
@@ -62,11 +63,13 @@ export default function ManageStudents() {
   const handleUsernameChange = (e) => {
     const filtered = e.target.value.replace(/[^A-Za-z0-9_.-]/g, '');
     setForm({ ...form, username: filtered });
+    if (fieldErrors.username) setFieldErrors({ ...fieldErrors, username: '' });
   };
 
   const handleFormStudentCodeChange = (e) => {
     const numericOnly = e.target.value.replace(/[^0-9]/g, '').slice(0, 5);
     setForm({ ...form, student_code: numericOnly });
+    if (fieldErrors.student_code) setFieldErrors({ ...fieldErrors, student_code: '' });
   };
 
   const handleBloodTypeChange = (e) => {
@@ -82,6 +85,19 @@ export default function ManageStudents() {
   const handleEmailChange = (e) => {
     const filtered = e.target.value.replace(/[^A-Za-z0-9@._+-]/g, '');
     setForm({ ...form, email: filtered });
+    if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: '' });
+  };
+
+  // เช็คซ้ำตอนออกจากช่อง (onBlur) - เฉพาะตอนเพิ่มสมาชิกใหม่เท่านั้น เพราะตอนแก้ไข ข้อมูลเดิมของคนคนนั้น
+  // จะชนกับตัวเองเสมอ (เช่น username เดิมของ user ที่กำลังแก้ไขอยู่) ตรวจรูปแบบก่อนเสมอ ไม่ยิง API เปล่าๆ
+  const checkFieldAvailable = async (field, value) => {
+    if (editing || !value || !FIELD_PATTERNS[field].test(value)) return;
+    try {
+      const res = await api.checkAvailable(field, value);
+      setFieldErrors((prev) => ({ ...prev, [field]: res.available ? '' : res.message }));
+    } catch {
+      // เงียบไว้ ไม่ block ผู้ใช้ - ตอนกด "เพิ่มสมาชิก" จริง backend ยังตรวจซ้ำอีกชั้นอยู่แล้ว
+    }
   };
 
   const handleFileSelect = (e) => {
@@ -107,6 +123,7 @@ export default function ManageStudents() {
   const startEdit = (s) => {
     setShowAddForm(false);
     setEditing(s.user_id);
+    setFieldErrors({ username: '', student_code: '', email: '' });
     setForm({
       role: s.role, username: s.username, password: '',
       first_name: s.role === 'student' ? s.student_first_name : s.first_name,
@@ -117,12 +134,16 @@ export default function ManageStudents() {
       position: s.position || '', avatar: s.avatar || '', nickname: s.nickname || '',
     });
   };
-  const cancelEdit = () => { setEditing(null); setForm(emptyForm); };
-  const cancelAdd = () => { setShowAddForm(false); setForm(emptyForm); };
+  const cancelEdit = () => { setEditing(null); setForm(emptyForm); setFieldErrors({ username: '', student_code: '', email: '' }); };
+  const cancelAdd = () => { setShowAddForm(false); setForm(emptyForm); setFieldErrors({ username: '', student_code: '', email: '' }); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!editing && (fieldErrors.username || fieldErrors.student_code || fieldErrors.email)) {
+      setError('กรุณาแก้ไขข้อมูลที่ซ้ำก่อนเพิ่มสมาชิก');
+      return;
+    }
     try {
       const action = editing ? 'edit' : 'add';
       const payload = editing ? { ...form, action, user_id: editing } : { ...form, action };
@@ -207,7 +228,15 @@ export default function ManageStudents() {
           )}
           <div>
             <label>ชื่อผู้ใช้ (Username)</label>
-            <input maxLength={7} value={form.username} onChange={handleUsernameChange} required />
+            <input
+              maxLength={7}
+              value={form.username}
+              onChange={handleUsernameChange}
+              onBlur={(e) => checkFieldAvailable('username', e.target.value)}
+              className={fieldErrors.username ? 'input-error' : ''}
+              required
+            />
+            {fieldErrors.username && <p className="field-error-text">{fieldErrors.username}</p>}
           </div>
           <div>
             <label>{editing ? 'รหัสผ่านใหม่ (เว้นว่าง = ไม่เปลี่ยน)' : 'รหัสผ่าน'}</label>
@@ -237,7 +266,14 @@ export default function ManageStudents() {
             <div className="field-row" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginTop: 8, marginBottom: 20 }}>
               <div>
                 <label>อีเมล</label>
-                <input type="email" value={form.email} onChange={handleEmailChange} />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={handleEmailChange}
+                  onBlur={(e) => checkFieldAvailable('email', e.target.value)}
+                  className={fieldErrors.email ? 'input-error' : ''}
+                />
+                {fieldErrors.email && <p className="field-error-text">{fieldErrors.email}</p>}
               </div>
               <div>
                 <label>รหัสนักเรียน/นักศึกษา</label>
@@ -248,7 +284,10 @@ export default function ManageStudents() {
                   maxLength={5}
                   value={form.student_code}
                   onChange={handleFormStudentCodeChange}
+                  onBlur={(e) => checkFieldAvailable('student_code', e.target.value)}
+                  className={fieldErrors.student_code ? 'input-error' : ''}
                 />
+                {fieldErrors.student_code && <p className="field-error-text">{fieldErrors.student_code}</p>}
               </div>
               {editing && (
                 <>
@@ -371,7 +410,7 @@ export default function ManageStudents() {
                 type="button"
                 className="btn-add-circle"
                 title="เพิ่มสมาชิกใหม่"
-                onClick={(e) => { e.stopPropagation(); setShowAddForm(true); setForm(emptyForm); }}
+                onClick={(e) => { e.stopPropagation(); setShowAddForm(true); setForm(emptyForm); setFieldErrors({ username: '', student_code: '', email: '' }); }}
               >+</button>
             </div>
           </h3>

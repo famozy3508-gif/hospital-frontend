@@ -74,10 +74,21 @@ async function request(path, options = {}) {
   return data;
 }
 
+// ===== ตรวจ username/student_code/email ซ้ำแบบ real-time (onBlur) =====
+// รูปแบบต้องตรงกับที่ backend validate ตอนสมัคร/เพิ่มสมาชิกจริง (register.php, manage_students.php)
+// ใช้เช็คฝั่ง client ก่อนยิง API เช็คซ้ำ (check_available.php) กันยิง request เปล่าๆ ตอนกรอกไม่ครบ/ผิดรูปแบบ
+export const FIELD_PATTERNS = {
+  username: /^[A-Za-z0-9_.-]{3,50}$/,
+  student_code: /^[0-9]{1,20}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+};
+
 export const api = {
   get: (path) => request(path, { method: 'GET' }),
   post: (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) }),
   del: (path) => request(path, { method: 'DELETE' }),
+  // เช็คว่า field (username/student_code/email) นี้ถูกใช้ไปแล้วหรือยัง - ไม่ต้องล็อกอิน
+  checkAvailable: (field, value) => request('/auth/check_available.php', { method: 'POST', body: JSON.stringify({ field, value }) }),
   // อัปโหลดไฟล์แบบ multipart/form-data (ใช้กับรูปโปรไฟล์)
   uploadFile: async (path, file, fieldName = 'avatar') => {
     const formData = new FormData();

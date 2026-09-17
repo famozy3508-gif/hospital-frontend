@@ -1,7 +1,7 @@
 // src/pages/Register.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, FIELD_PATTERNS } from '../api/client';
 import StatusModal from '../components/StatusModal';
 
 function EyeIcon() {
@@ -30,6 +30,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({ username: '', student_code: '', email: '' });
   const [modalStatus, setModalStatus] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
   const navigate = useNavigate();
@@ -39,21 +40,40 @@ export default function Register() {
   const numericOnlyUpdate = (key) => (e) => {
     const numericOnly = e.target.value.replace(/[^0-9]/g, '');
     setForm({ ...form, [key]: numericOnly });
+    if (fieldErrors[key]) setFieldErrors({ ...fieldErrors, [key]: '' });
   };
 
   const handleUsernameChange = (e) => {
     const filtered = e.target.value.replace(/[^A-Za-z0-9_.-]/g, '');
     setForm({ ...form, username: filtered });
+    if (fieldErrors.username) setFieldErrors({ ...fieldErrors, username: '' });
   };
 
   const handleEmailChange = (e) => {
     const filtered = e.target.value.replace(/[^A-Za-z0-9@._+-]/g, '');
     setForm({ ...form, email: filtered });
+    if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: '' });
+  };
+
+  // เช็คซ้ำตอนออกจากช่อง (onBlur) - ตรวจรูปแบบก่อนเสมอ ถ้ารูปแบบยังผิด/ว่างไม่ต้องยิง API เปล่าๆ
+  // ถ้าเช็คไม่สำเร็จ (เช่นโดน rate limit ชั่วคราว) ปล่อยผ่านเงียบๆ เพราะตอนกดสมัครจริง backend ยังตรวจซ้ำอีกชั้นอยู่แล้ว
+  const checkFieldAvailable = async (field, value) => {
+    if (!value || !FIELD_PATTERNS[field].test(value)) return;
+    try {
+      const res = await api.checkAvailable(field, value);
+      setFieldErrors((prev) => ({ ...prev, [field]: res.available ? '' : res.message }));
+    } catch {
+      // เงียบไว้ ไม่ block ผู้ใช้
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (fieldErrors.username || fieldErrors.student_code || fieldErrors.email) {
+      setError('กรุณาแก้ไขข้อมูลที่ซ้ำก่อนสมัครสมาชิก');
+      return;
+    }
     try {
       const data = await api.post('/auth/register.php', form);
       setModalStatus('success');
@@ -92,9 +112,12 @@ export default function Register() {
           maxLength={5}
           value={form.student_code}
           onChange={numericOnlyUpdate('student_code')}
+          onBlur={(e) => checkFieldAvailable('student_code', e.target.value)}
           placeholder="กรุณากรอกข้อมูล"
+          className={fieldErrors.student_code ? 'input-error' : ''}
           required
         />
+        {fieldErrors.student_code && <p className="field-error-text">{fieldErrors.student_code}</p>}
 
         <label>ชื่อ</label>
         <input value={form.first_name} onChange={update('first_name')} placeholder="กรุณากรอกข้อมูล" required />
@@ -103,10 +126,28 @@ export default function Register() {
         <input value={form.last_name} onChange={update('last_name')} placeholder="กรุณากรอกข้อมูล" required />
 
         <label>อีเมล</label>
-        <input type="email" value={form.email} onChange={handleEmailChange} placeholder="กรุณากรอกอีเมล เช่น example@gmail.com" required />
+        <input
+          type="email"
+          value={form.email}
+          onChange={handleEmailChange}
+          onBlur={(e) => checkFieldAvailable('email', e.target.value)}
+          placeholder="กรุณากรอกอีเมล เช่น example@gmail.com"
+          className={fieldErrors.email ? 'input-error' : ''}
+          required
+        />
+        {fieldErrors.email && <p className="field-error-text">{fieldErrors.email}</p>}
 
         <label>ชื่อผู้ใช้ (Username)</label>
-        <input maxLength={7} value={form.username} onChange={handleUsernameChange} placeholder="กรุณากรอกข้อมูล" required />
+        <input
+          maxLength={7}
+          value={form.username}
+          onChange={handleUsernameChange}
+          onBlur={(e) => checkFieldAvailable('username', e.target.value)}
+          placeholder="กรุณากรอกข้อมูล"
+          className={fieldErrors.username ? 'input-error' : ''}
+          required
+        />
+        {fieldErrors.username && <p className="field-error-text">{fieldErrors.username}</p>}
 
         <label>รหัสผ่าน</label>
         <div style={{ position: 'relative' }}>
